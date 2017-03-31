@@ -93,12 +93,15 @@ a:hover {
     font-size: 10px;
   }
 }
-@media (max-width: 600px) {
+@media (max-width: 450px) {
   svg {
     font-size: 8px;
   }
   .donut .explanation {
     font-size: 7px;
+  }
+  .pct {
+    font-size: 8px;
   }
 }
 </style>
@@ -200,14 +203,14 @@ var cumulativeScale = d3.scaleLinear()
 
 var lastWidth;
 function draw() {
-  var width = document.body.clientWidth || window.innerWidth || document.documentElement.clientWidth;
-  if (lastWidth === width) return;
-  lastWidth = width;
-  d3.select('.left').style('left', Math.max(0, ((width - 800 - 55) / 2)) + 'px');
-  if (width <= 800) {
+  var windowWidth = document.body.clientWidth || window.innerWidth || document.documentElement.clientWidth;
+  if (lastWidth === windowWidth) return;
+  lastWidth = windowWidth;
+  d3.select('.left').style('left', Math.max(0, ((windowWidth - 800 - 55) / 2)) + 'px');
+  if (windowWidth <= 800) {
     d3.select('#calendar').style('left', '0px');
   } else {
-    d3.select('#calendar').style('left', Math.max(0, ((width - 800 - 55) / 2) + 300) + 'px');
+    d3.select('#calendar').style('left', Math.max(0, ((windowWidth - 800 - 55) / 2) + 300) + 'px');
   }
   var start = d3.timeMonth(moment().subtract(2, 'weeks').toDate());
   var end = d3.timeMonth(moment().add(40, 'weeks').toDate());
@@ -219,7 +222,7 @@ function draw() {
     left: 1
   };
 
-  var cellSize = Math.min(67, Math.round((width - margin.left - margin.right - 10) / 7));
+  var cellSize = Math.min(67, Math.round((windowWidth - margin.left - margin.right - 10) / 7));
 
   var width = cellSize * 7;
   var height = cellSize * (d3.timeWeek.count(start, end) + 1);
@@ -283,19 +286,19 @@ function draw() {
       .attr("width", cellSize)
       .attr("height", cellSize);
 
-  var x = width > 500 ? 2 : 1;
-  var y = width > 500 ? 10 : 8;
+  var xOffset = windowWidth > 500 ? 2 : 1;
+  var yOffset = windowWidth > 500 ? 10 : 8;
   days.filter(function (d) {
     return d.getDate() !== 1;
   }).append('text').text(function (d) {
     return moment(d).format('D')
-  }).attr('x', x).attr('y', y);
+  }).attr('x', xOffset).attr('y', yOffset);
 
   days.filter(function (d) {
     return d.getDate() === 1;
   }).append('text').text(function (d) {
     return moment(d).format('MMMM');
-  }).attr('x', x).attr('y', y).attr('class', 'month');
+  }).attr('x', xOffset).attr('y', yOffset).attr('class', 'month');
 
   var donutMaker = d3.arc()
     .startAngle(0)
