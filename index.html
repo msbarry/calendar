@@ -93,6 +93,14 @@ a:hover {
     font-size: 10px;
   }
 }
+@media (max-width: 600px) {
+  svg {
+    font-size: 8px;
+  }
+  .donut .explanation {
+    font-size: 7px;
+  }
+}
 </style>
 <body style="display:none;">
 <div class="left">
@@ -190,12 +198,16 @@ var cumulativeScale = d3.scaleLinear()
   .range(cumulativeData.map(function (d) { return d[1] / cumulative; }))
   .clamp(true);
 
+var lastWidth;
 function draw() {
-  d3.select('.left').style('left', Math.max(0, ((window.innerWidth - 800 - 55) / 2)) + 'px');
-  if (window.innerWidth <= 800) {
+  var width = document.body.clientWidth || window.innerWidth || document.documentElement.clientWidth;
+  if (lastWidth === width) return;
+  lastWidth = width;
+  d3.select('.left').style('left', Math.max(0, ((width - 800 - 55) / 2)) + 'px');
+  if (width <= 800) {
     d3.select('#calendar').style('left', '0px');
   } else {
-    d3.select('#calendar').style('left', Math.max(0, ((window.innerWidth - 800 - 55) / 2) + 300) + 'px');
+    d3.select('#calendar').style('left', Math.max(0, ((width - 800 - 55) / 2) + 300) + 'px');
   }
   var start = d3.timeMonth(moment().subtract(2, 'weeks').toDate());
   var end = d3.timeMonth(moment().add(40, 'weeks').toDate());
@@ -207,7 +219,7 @@ function draw() {
     left: 1
   };
 
-  var cellSize = Math.min(67, Math.round((window.innerWidth - margin.left - margin.right - 10) / 7));
+  var cellSize = Math.min(67, Math.round((width - margin.left - margin.right - 10) / 7));
 
   var width = cellSize * 7;
   var height = cellSize * (d3.timeWeek.count(start, end) + 1);
@@ -271,17 +283,19 @@ function draw() {
       .attr("width", cellSize)
       .attr("height", cellSize);
 
+  var x = width > 500 ? 2 : 1;
+  var y = width > 500 ? 10 : 8;
   days.filter(function (d) {
     return d.getDate() !== 1;
   }).append('text').text(function (d) {
     return moment(d).format('D')
-  }).attr('x', 2).attr('y', 10);
+  }).attr('x', x).attr('y', y);
 
   days.filter(function (d) {
     return d.getDate() === 1;
   }).append('text').text(function (d) {
     return moment(d).format('MMMM');
-  }).attr('x', 2).attr('y', 10).attr('class', 'month');
+  }).attr('x', x).attr('y', y).attr('class', 'month');
 
   var donutMaker = d3.arc()
     .startAngle(0)
